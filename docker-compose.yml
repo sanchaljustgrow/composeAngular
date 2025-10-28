@@ -1,0 +1,43 @@
+version: "3.9"
+
+services:
+  backend:
+    image: sanchaljustgrow/ang-spring-backend:latest
+    container_name: ang-spring-backend
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/blogdb
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    depends_on:
+      - mysql
+
+  frontend:
+    image: sanchaljustgrow/ang-spring-frontend:latest
+    container_name: ang-spring-frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    environment:
+      # 👇 Update this base URL inside Angular environment.ts if needed
+      - API_BASE_URL=http://localhost:8080
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: blogdb
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:
