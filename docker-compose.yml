@@ -1,53 +1,25 @@
-version: "3.9"
-
 services:
-  mysql:
+  real-estate-db:
     image: mysql:8.0
-    container_name: ang-spring-mysql
+    container_name: real-estate-db
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: postshare
-      MYSQL_USER: postshare
-      MYSQL_PASSWORD: postshare123
-    ports:
-      - "3307:3306"
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DB}
     volumes:
       - db_data:/var/lib/mysql
+    ports:
+      - "3307:3306"
     restart: always
 
-  backend:
-    image: sanchaljustgrow/ang-spring-backend:latest
-    container_name: ang-spring-backend
+  real-estate-backend:
+    image: real-estate-backend:latest
+    container_name: real-estate-backend
+    env_file:
+      - .env
     depends_on:
-      - mysql
+      - real-estate-db
     ports:
       - "8080:8080"
-    environment:
-      SPRING_PROFILES_ACTIVE: dev
-      DB_URL: jdbc:mysql://mysql:3306/postshare?useSSL=false&allowPublicKeyRetrieval=true
-      DB_USERNAME: postshare
-      DB_PASSWORD: postshare123
-      JWT_SECRET: lxpoR6cDdC+uRSJurL35sd+o5osWKoSqcRfh4HhJCr6DCtxnzC/TS4OWbnxBw6ZksxFx1s2QDM7HgRpBV0k/jg==
-      JWT_EXPIRATION: 43200000
-    restart: always
-
-  frontend:
-    image: sanchaljustgrow/ang-spring-frontend:latest
-    container_name: ang-spring-frontend
-    depends_on:
-      - backend
-    ports:
-      - "4200:80"
-    environment:
-      API_URL: http://backend:8080
-      ENVIRONMENT: production
-    volumes:
-      # Optional: for dynamic env injection (template → env.js)
-      - ./frontend/src/assets/env.template.js:/usr/share/nginx/html/assets/env.template.js
-    command: >
-      /bin/sh -c "
-      envsubst < /usr/share/nginx/html/assets/env.template.js > /usr/share/nginx/html/assets/env.js &&
-      nginx -g 'daemon off;'"
     restart: always
 
 volumes:
