@@ -1,67 +1,44 @@
 version: "3.9"
 
 services:
-  # ======================
-  # MySQL Database
-  # ======================
   mysql:
     image: mysql:8.0
-    container_name: mysql
+    container_name: mysql-db
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: blogdb
+      MYSQL_DATABASE: restaurant_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
     ports:
-      - "3307:3306"        # MySQL exposed on local port 3307
+      - "3307:3306"   # Expose MySQL on 3307 (host)
     volumes:
       - mysql_data:/var/lib/mysql
-    networks:
-      - app-network
 
-  # ======================
-  # Spring Boot Backend
-  # ======================
   backend:
-    image: sanchaljustgrow/ang-spring-backend:latest
-    container_name: ang-spring-backend
+    build: ./backend
+    container_name: spring-backend
     restart: always
     depends_on:
       - mysql
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/blogdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/restaurant_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: password
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SERVER_PORT: 8080
     ports:
-      - "8080:8080"
-    networks:
-      - app-network
+      - "8080:8080"   # Spring Boot backend
 
-  # ======================
-  # Angular Frontend
-  # ======================
   frontend:
-    image: sanchaljustgrow/ang-spring-frontend:latest
-    container_name: ang-spring-frontend
+    build: ./frontend
+    container_name: angular-frontend
     restart: always
+    ports:
+      - "4200:80"   # Angular app on localhost:4200
     depends_on:
       - backend
-    ports:
-      - "4200:80"        # Angular app accessible via localhost:4200
     environment:
-      # Backend accessible within Docker network as 'ang-spring-backend'
-      API_BASE_URL: http://ang-spring-backend:8080
-    networks:
-      - app-network
+      API_BASE_URL: http://spring-backend:8080
 
-# ======================
-# Volumes and Networks
-# ======================
 volumes:
   mysql_data:
-    driver: local
-
-networks:
-  app-network:
-    driver: bridge
