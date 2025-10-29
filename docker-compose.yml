@@ -1,25 +1,45 @@
+version: "3.9"
+
 services:
-  real-estate-db:
+  mysql:
     image: mysql:8.0
-    container_name: real-estate-db
+    container_name: ang-spring-mysql
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DB}
-    volumes:
-      - db_data:/var/lib/mysql
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
       - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
     restart: always
 
-  real-estate-backend:
-    image: real-estate-backend:latest
-    container_name: real-estate-backend
-    env_file:
-      - .env
+  backend:
+    image: sanchaljustgrow/ang-spring-backend:latest
+    container_name: ang-spring-backend
     depends_on:
-      - real-estate-db
+      - mysql
     ports:
       - "8080:8080"
+    environment:
+      DB_URL: ${DB_URL}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION}
+    restart: always
+
+  frontend:
+    image: sanchaljustgrow/ang-spring-frontend:latest
+    container_name: ang-spring-frontend
+    depends_on:
+      - backend
+    ports:
+      - "4200:80"
+    environment:
+      API_URL: ${API_URL}
+      ENVIRONMENT: ${ENVIRONMENT}
     restart: always
 
 volumes:
