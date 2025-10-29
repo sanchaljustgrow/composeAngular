@@ -1,37 +1,29 @@
-version: "3.9"
+version: "3.8"
 
 services:
-  mysql:
-    image: mysql:8
-    container_name: mysql
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: blogdb
-    ports:
-      - "3307:3306"
-
   backend:
-    build:
-      context: ../ang-spring/backend
-      dockerfile: Dockerfile
-    container_name: springboot
+    build: ./backend
+    container_name: backend
     ports:
       - "8080:8080"
-    depends_on:
-      - mysql
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/blogdb
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: root
-    restart: always
+      - SPRING_PROFILES_ACTIVE=dev
+    networks:
+      - app-network
 
   frontend:
-    build:
-      context: ../ang-spring/frontend
-      dockerfile: Dockerfile
-    container_name: angular
+    build: ./frontend
+    container_name: frontend
     ports:
-      - "4200:4200"
+      - "80:80"
     depends_on:
       - backend
+    environment:
+      # 👇 This will override the frontend API URL dynamically
+      - API_URL=http://localhost:8080
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
