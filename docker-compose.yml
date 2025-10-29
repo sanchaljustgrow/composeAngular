@@ -2,43 +2,36 @@ version: "3.9"
 
 services:
   mysql:
-    image: mysql:8.0
-    container_name: mysql-db
+    image: mysql:8
+    container_name: mysql
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: restaurant_db
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: blogdb
     ports:
-      - "3307:3306"   # Expose MySQL on 3307 (host)
-    volumes:
-      - mysql_data:/var/lib/mysql
+      - "3307:3306"
 
   backend:
-    build: ./backend
-    container_name: spring-backend
-    restart: always
+    build:
+      context: ../ang-spring/backend
+      dockerfile: Dockerfile
+    container_name: springboot
+    ports:
+      - "8080:8080"
     depends_on:
       - mysql
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/restaurant_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-      SPRING_DATASOURCE_USERNAME: user
-      SPRING_DATASOURCE_PASSWORD: password
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-    ports:
-      - "8080:8080"   # Spring Boot backend
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/blogdb
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+    restart: always
 
   frontend:
-    build: ./frontend
-    container_name: angular-frontend
-    restart: always
+    build:
+      context: ../ang-spring/frontend
+      dockerfile: Dockerfile
+    container_name: angular
     ports:
-      - "4200:80"   # Angular app on localhost:4200
+      - "4200:4200"
     depends_on:
       - backend
-    environment:
-      API_BASE_URL: http://spring-backend:8080
-
-volumes:
-  mysql_data:
