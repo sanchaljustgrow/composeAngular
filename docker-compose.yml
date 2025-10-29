@@ -1,12 +1,31 @@
 version: "3.9"
 services:
+  mysql:
+    image: mysql:8.0
+    container_name: ang-spring-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: realestate
+      MYSQL_USER: user
+      MYSQL_PASSWORD: user123
+    ports:
+      - "3307:3306"   # use 3307 to avoid conflict with local MySQL
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: always
+
   backend:
     image: sanchaljustgrow/ang-spring-backend:latest
     container_name: ang-spring-backend
+    depends_on:
+      - mysql
     ports:
       - "8080:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-dev}
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/realestate
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=user123
     restart: always
 
   frontend:
@@ -21,3 +40,5 @@ services:
       - ENVIRONMENT=${ENVIRONMENT:-development}
     restart: always
 
+volumes:
+  db_data:
