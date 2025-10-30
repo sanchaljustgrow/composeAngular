@@ -1,8 +1,11 @@
+version: "3.8"
+
 services:
-  angular-frontend:
-    image: sanchaljustgrow/ang-springs-frontend:latest
-    container_name: angular-frontend
+  my-login-app:
+    build: .
+    container_name: my-login-app
     ports:
       - "8080:80"
     environment:
-      - API_URL=http://localhost:8081/v1   # change this anytime, no rebuild needed
+      - API_URL=https://dummyjson.com/auth/login
+    restart: unless-stopped
