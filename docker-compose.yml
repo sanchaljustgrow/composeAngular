@@ -5,4 +5,4 @@ services:
     ports:
       - "8080:80"
     environment:
-      - API_URL=https://dummyjson.com/auth/login
+      - API_URL=https://example.com/auth/login
