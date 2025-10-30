@@ -2,11 +2,8 @@ version: "3.8"
 
 services:
   angular-frontend:
-    image: sanchaljustgrow/ang-springs-frontend:latest
-    container_name: angular-frontend
+    build: .
     ports:
       - "8080:80"
-    env_file:
-      - .env.dev
-    volumes:
-      - ./runtime-env.js:/usr/share/nginx/html/runtime-env.js:ro
+    environment:
+      - API_URL=http://localhost:8081/v1   # change this anytime at runtime
