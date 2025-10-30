@@ -1,46 +1,12 @@
-version: "3.9"
+version: "3.8"
 
 services:
-  mysql:
-    image: mysql:8.0
-    container_name: ang-spring-mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+  angular-frontend:
+    image: sanchaljustgrow/ang-springs-frontend:latest
+    container_name: angular-frontend
     ports:
-      - "3307:3306"
-    volumes:
-      - db_data:/var/lib/mysql
-    restart: always
-
-  backend:
-    image: sanchaljustgrow/ang-spring-backend:latest
-    container_name: ang-spring-backend
-    depends_on:
-      - mysql
-    ports:
-      - "8080:8080"
+      - "8080:80"
+    env_file:
+      - .env
     environment:
-      DB_URL: ${DB_URL}
-      DB_USERNAME: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
-      JWT_SECRET: ${JWT_SECRET}
-      JWT_EXPIRATION: ${JWT_EXPIRATION}
-    restart: always
-
-  frontend:
-    image: sanchaljustgrow/ang-spring-frontend:latest
-    container_name: ang-spring-frontend
-    depends_on:
-      - backend
-    ports:
-      - "4200:80"
-    environment:
-      API_URL: ${API_URL}
-      ENVIRONMENT: ${ENVIRONMENT}
-    restart: always
-
-volumes:
-  db_data:
+      - API_URL=${API_URL}
