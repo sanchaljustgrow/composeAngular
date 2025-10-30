@@ -7,6 +7,6 @@ services:
     ports:
       - "8080:80"
     env_file:
-      - .env
+      - .env.dev
     environment:
       - API_URL=${API_URL}
