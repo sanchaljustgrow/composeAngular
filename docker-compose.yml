@@ -1,3 +1,5 @@
+version: "3.8"
+
 services:
   angular-frontend:
     image: sanchaljustgrow/ang-springs-frontend:latest
@@ -6,3 +8,5 @@ services:
       - "8080:80"
     env_file:
       - .env.dev
+    volumes:
+      - ./runtime-env.js:/usr/share/nginx/html/runtime-env.js:ro
