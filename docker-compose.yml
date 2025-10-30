@@ -1,8 +1,12 @@
+version: "3.8"
+
 services:
   angular-frontend:
     image: sanchaljustgrow/ang-springs-frontend:latest
     container_name: angular-frontend
     ports:
       - "8080:80"
+    env_file:
+      - .env.dev
     environment:
-      - API_URL=https://example.com/auth/login
+      - API_URL=${API_URL}
