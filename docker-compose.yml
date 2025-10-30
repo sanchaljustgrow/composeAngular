@@ -1,9 +1,8 @@
-version: "3.8"
-
 services:
   angular-frontend:
-    build: .
+    image: sanchaljustgrow/ang-springs-frontend:latest
+    container_name: angular-frontend
     ports:
       - "8080:80"
     environment:
-      - API_URL=http://localhost:8081/v1   # change this anytime at runtime
+      - API_URL=http://localhost:8081/v1   # change this anytime, no rebuild needed
